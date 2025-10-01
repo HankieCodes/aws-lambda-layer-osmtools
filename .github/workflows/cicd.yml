@@ -1,9 +1,11 @@
 name: AWS-Lambda-Layer-OSMTools CI-CD
+
 on:
   push:
     branches: ["*"]
   pull_request:
     branches: ["*"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,6 +15,41 @@ jobs:
         run: bash ./build-libraries.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: aws-lambda-layer-osmtools.zip
+          name: aws-lambda-layer-osmtools
           path: aws-lambda-layer-osmtools.zip
           if-no-files-found: error
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-2
+    permissions:
+      id-token: write
+      contents: read
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: aws-lambda-layer-osmtools
+      - name: Authenticate AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::106542751629:role/GitHubActions-AWSLambdaLayerOSMTools
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Publish Layer
+        run: |
+          aws s3 cp aws-lambda-layer-osmtools.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools.zip
+          export LAYER_VERSION=$(aws lambda publish-layer-version \
+            --layer-name aws-lambda-layer-osmtools \
+            --description "OpenStreetMap C++ tools available as an AWS Lambda Layer!" \
+            --compatible-runtimes "nodejs22.x" \
+            --license-info "https://github.com/hnryjms/aws-lambda-layer-osmtools/blob/main/LICENSE.txt" \
+            --compatible-architectures "x86_64" \
+            --content "S3Bucket=aws-lambda-layer-osmtools,S3Key=aws-lambda-layer-osmtools.zip" \
+            --query "Version")
+          aws lambda add-layer-version-permission \
+            --layer-name aws-lambda-layer-osmtools \
+            --version-number $LAYER_VERSION \
+            --statement-id public-layer \
+            --principal "*" \
+            --action "lambda:GetLayerVersion"

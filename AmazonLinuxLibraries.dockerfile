@@ -95,11 +95,14 @@ RUN tar -xf tilemaker.tgz && \
     cmake --build .
 
 RUN cd osrm-backend-${OSRM_VERSION} && \
-    mkdir -p /home/export/node_modules/@project-osrm/osrm/lib && \
-    cp package.json /home/export/node_modules/@project-osrm/osrm/ && \
-    cp package-lock.json /home/export/node_modules/@project-osrm/osrm/ && \
-    cp lib/index.js /home/export/node_modules/@project-osrm/osrm/lib/index.js && \
-    cp -r lib/binding /home/export/node_modules/@project-osrm/osrm/lib && \
+    mkdir -p /home/export/nodejs/node_modules/@project-osrm/osrm/lib && \
+    cp package.json /home/export/nodejs/node_modules/@project-osrm/osrm/ && \
+    cp package-lock.json /home/export/nodejs/node_modules/@project-osrm/osrm/ && \
+    cp lib/index.js /home/export/nodejs/node_modules/@project-osrm/osrm/lib/index.js && \
+    cp -r lib/binding /home/export/nodejs/node_modules/@project-osrm/osrm/lib && \
+    mkdir /home/export/bin && \
+    mv /home/export/nodejs/node_modules/@project-osrm/osrm/lib/binding/* /home/export/bin/ && \
+    mv /home/export/bin/node_osrm.node /home/export/nodejs/node_modules/@project-osrm/osrm/lib/binding/ && \
     mkdir /home/export/lib && \
     cp /usr/lib64/libboost_regex.so.1.75.0 /home/export/lib/ && \
     cp /usr/lib64/libboost_date_time.so.1.75.0 /home/export/lib/ && \
@@ -114,7 +117,6 @@ RUN cd osrm-backend-${OSRM_VERSION} && \
     cp /usr/lib64/libicui18n.so.67 /home/export/lib/ && \
     cp /usr/lib64/libicuuc.so.67 /home/export/lib/ && \
     cd ../osmium-tool-1.18.0 && \
-    mkdir /home/export/bin && \
     cp build/src/osmium /home/export/bin/osmium && \
     cp /usr/lib64/libexpat.so.1 /home/export/lib/ && \
     cd ../tilemaker-${TILEMAKER_VERSION} && \
