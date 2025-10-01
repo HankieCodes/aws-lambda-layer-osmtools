@@ -122,4 +122,4 @@ RUN cd osrm-backend-${OSRM_VERSION} && \
     cp /usr/lib64/libatomic.so.1 /home/export/lib/ && \
     cp build/tilemaker /home/export/bin/tilemaker && \
     cd /home/export && \
-    zip -r /home/osrm-prebuilt-amazonlinux2023.zip .
+    zip -r /home/aws-lambda-layer-osmtools.zip .
