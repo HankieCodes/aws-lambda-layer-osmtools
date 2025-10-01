@@ -1,10 +1,14 @@
 FROM --platform=linux/amd64 amazonlinux:2023
 
-# todo- remove rapidjson
+ARG NODE_VERSION="22.15.0"
+ARG OSRM_VERSION="6.0.0"
+ARG TILEMAKER_VERSION="3.0.0"
+ARG MAPNIK_VERSION="4.1.3"
+
 RUN yum -y install libxml2-devel bzip2-devel boost-devel libzip-devel \
       lua.x86_64 lua-devel.x86_64 luajit.x86_64 luajit-devel.x86_64 \
-      expat expat-devel sqlite-devel rapidjson-devel libatomic \
-      bzip2 diffutils binutils gcc14 gcc14-c++ cmake unzip wget tar xz gzip
+      expat expat-devel sqlite-devel libatomic bzip2 diffutils binutils \
+      gcc14 gcc14-c++ cmake unzip wget tar xz gzip
 
 WORKDIR /home
 
@@ -13,19 +17,19 @@ RUN tar -xf onetbb.tgz && \
     cp -a oneapi-tbb-2022.1.0/lib/intel64/gcc4.8/. /usr/local/lib/ && \
     cp -a oneapi-tbb-2022.1.0/include/. /usr/local/include/
 
-RUN wget "https://nodejs.org/dist/v22.15.0/node-v22.15.0-linux-x64.tar.xz" -O node.tgz
+RUN wget "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -O node.tgz
 RUN tar -xf node.tgz && \
-    ls node-v22.15.0-linux-x64 && \
-    cp -a node-v22.15.0-linux-x64/bin/. /usr/local/bin && \
-    cp -a node-v22.15.0-linux-x64/include/. /usr/local/include && \
-    cp -a node-v22.15.0-linux-x64/lib/. /usr/local/lib && \
-    cp -a node-v22.15.0-linux-x64/share/. /usr/local/share && \
+    ls node-v${NODE_VERSION}-linux-x64 && \
+    cp -a node-v${NODE_VERSION}-linux-x64/bin/. /usr/local/bin && \
+    cp -a node-v${NODE_VERSION}-linux-x64/include/. /usr/local/include && \
+    cp -a node-v${NODE_VERSION}-linux-x64/lib/. /usr/local/lib && \
+    cp -a node-v${NODE_VERSION}-linux-x64/share/. /usr/local/share && \
     export PATH="$PATH:/usr/local/bin" && \
     node -v
 
-RUN wget "https://github.com/Project-OSRM/osrm-backend/archive/refs/tags/v6.0.0.tar.gz" -O osrm.tgz
+RUN wget "https://github.com/Project-OSRM/osrm-backend/archive/refs/tags/v${OSRM_VERSION}.tar.gz" -O osrm.tgz
 RUN tar -xf osrm.tgz && \
-    cd osrm-backend-6.0.0 && \
+    cd osrm-backend-${OSRM_VERSION} && \
     npm install --ignore-scripts && \
     sed -i -e 's/LUA_COMPAT_5_2/LUA_COMPAT_5_2 1/g' /usr/include/luaconf-x86_64.h && \
     sed -i '1s/^/#include <utility>\n/' /usr/include/boost/asio/awaitable.hpp && \
@@ -69,7 +73,7 @@ RUN tar -xf osmium.tgz && \
     cmake --build .
 
 RUN wget "https://github.com/OSGeo/shapelib/releases/download/v1.6.1/shapelib-1.6.1.tar.gz" -O shapelib.tgz
-RUN wget "https://github.com/systemed/tilemaker/archive/refs/tags/v3.0.0.tar.gz" -O tilemaker.tgz
+RUN wget "https://github.com/systemed/tilemaker/archive/refs/tags/v${TILEMAKER_VERSION}.tar.gz" -O tilemaker.tgz
 RUN tar -xf shapelib.tgz && \
     cd shapelib-1.6.1 && \
     CXX=gcc14-g++ ./configure && \
@@ -84,13 +88,13 @@ RUN unzip rapidjson.zip && \
     cmake --build . && \
     cmake --install .
 RUN tar -xf tilemaker.tgz && \
-    cd tilemaker-3.0.0 && \
+    cd tilemaker-${TILEMAKER_VERSION} && \
     mkdir build && \
     cd build && \
     CXX=gcc14-g++ CC=gcc14-cc cmake .. && \
     cmake --build .
 
-RUN cd osrm-backend-6.0.0 && \
+RUN cd osrm-backend-${OSRM_VERSION} && \
     mkdir -p /home/export/node_modules/@project-osrm/osrm/lib && \
     cp package.json /home/export/node_modules/@project-osrm/osrm/ && \
     cp package-lock.json /home/export/node_modules/@project-osrm/osrm/ && \
@@ -113,7 +117,7 @@ RUN cd osrm-backend-6.0.0 && \
     mkdir /home/export/bin && \
     cp build/src/osmium /home/export/bin/osmium && \
     cp /usr/lib64/libexpat.so.1 /home/export/lib/ && \
-    cd ../tilemaker-3.0.0 && \
+    cd ../tilemaker-${TILEMAKER_VERSION} && \
     cp /usr/local/lib/libshp.so.4 /home/export/lib/ && \
     cp /usr/lib64/libatomic.so.1 /home/export/lib/ && \
     cp build/tilemaker /home/export/bin/tilemaker && \
