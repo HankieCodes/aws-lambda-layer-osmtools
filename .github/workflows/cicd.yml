@@ -19,6 +19,7 @@ jobs:
           path: aws-lambda-layer-osmtools.zip
           if-no-files-found: error
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-2
