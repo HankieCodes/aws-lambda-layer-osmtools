@@ -1,0 +1,18 @@
+name: AWS-Lambda-Layer-OSMTools CI-CD
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build Libraries
+        run: bash ./build-libraries.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aws-lambda-layer-osmtools.zip
+          path: aws-lambda-layer-osmtools.zip
+          if-no-files-found: error
