@@ -40,7 +40,6 @@ export const handler = async (event) => {
 
 ## To Do
 
-- [ ] Split OSRM / Osmium / Tilemaker into individual, combinable layers
 - [ ] Add other runtime support (mainly CLI-only option)
 
 ## Support

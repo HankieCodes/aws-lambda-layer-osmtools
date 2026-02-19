@@ -94,34 +94,58 @@ RUN tar -xf tilemaker.tgz && \
     CXX=gcc14-g++ CC=gcc14-cc cmake .. && \
     cmake --build .
 
+RUN mkdir -p /home/export/lib && \
+    cp /usr/lib64/libboost_program_options.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libboost_system.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libboost_iostreams.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libboost_regex.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libicudata.so.67 /home/export/lib/ && \
+    cp /usr/lib64/libicui18n.so.67 /home/export/lib/ && \
+    cp /usr/lib64/libicuuc.so.67 /home/export/lib/ && \
+    cp /usr/lib64/liblua-5.4.so /home/export/lib/ && \
+    cp /usr/lib64/libexpat.so.1 /home/export/lib/ && \
+    cd /home/export && \
+    zip -r /home/aws-lambda-layer-osmtools-base.zip . && \
+    rm -rf /home/export
+
 RUN cd osrm-backend-${OSRM_VERSION} && \
     mkdir -p /home/export/nodejs/node_modules/@project-osrm/osrm/lib && \
     cp package.json /home/export/nodejs/node_modules/@project-osrm/osrm/ && \
     cp package-lock.json /home/export/nodejs/node_modules/@project-osrm/osrm/ && \
     cp lib/index.js /home/export/nodejs/node_modules/@project-osrm/osrm/lib/index.js && \
     cp -r lib/binding /home/export/nodejs/node_modules/@project-osrm/osrm/lib && \
-    mkdir /home/export/bin && \
-    mv /home/export/nodejs/node_modules/@project-osrm/osrm/lib/binding/* /home/export/bin/ && \
-    mv /home/export/bin/node_osrm.node /home/export/nodejs/node_modules/@project-osrm/osrm/lib/binding/ && \
-    mkdir /home/export/lib && \
-    cp /usr/lib64/libboost_regex.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_date_time.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_chrono.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_filesystem.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_iostreams.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_thread.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_system.so.1.75.0 /home/export/lib/ && \
-    cp /usr/lib64/libboost_program_options.so.1.75.0 /home/export/lib/ && \
+    mkdir -p /home/export/bin && \
+    cp build/osrm-extract /home/export/bin/ && \
+    cp build/osrm-partition /home/export/bin/ && \
+    cp build/osrm-customize /home/export/bin/ && \
+    cp build/osrm-routed /home/export/bin/ && \
+    cp build/osrm-datastore /home/export/bin/ && \
+    cp build/osrm-contract /home/export/bin/ && \
+    mkdir -p /home/export/lib && \
     cp /usr/local/lib/libtbb.so.12 /home/export/lib/ && \
-    cp /usr/lib64/libicudata.so.67 /home/export/lib/ && \
-    cp /usr/lib64/libicui18n.so.67 /home/export/lib/ && \
-    cp /usr/lib64/libicuuc.so.67 /home/export/lib/ && \
-    cd ../osmium-tool-1.18.0 && \
-    cp build/src/osmium /home/export/bin/osmium && \
-    cp /usr/lib64/libexpat.so.1 /home/export/lib/ && \
-    cd ../tilemaker-${TILEMAKER_VERSION} && \
-    cp /usr/local/lib/libshp.so.4 /home/export/lib/ && \
-    cp /usr/lib64/libatomic.so.1 /home/export/lib/ && \
-    cp build/tilemaker /home/export/bin/tilemaker && \
+    cp /usr/lib64/libboost_date_time.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libboost_thread.so.1.75.0 /home/export/lib/ && \
     cd /home/export && \
-    zip -r /home/aws-lambda-layer-osmtools.zip .
+    zip -r /home/aws-lambda-layer-osmtools-osrm.zip . && \
+    rm -rf /home/export
+
+RUN mkdir -p /home/export/bin && \
+    cd tilemaker-${TILEMAKER_VERSION} && \
+    cp build/tilemaker /home/export/bin/tilemaker && \
+    mkdir -p /home/export/lib && \
+    cp /usr/local/lib/libshp.so.4 /home/export/lib/ && \
+    cp /usr/lib64/libsqlite3.so.0 /home/export/lib/ && \
+    cp /usr/lib64/libboost_filesystem.so.1.75.0 /home/export/lib/ && \
+    cp /usr/lib64/libatomic.so.1 /home/export/lib/ && \
+    cd /home/export && \
+    zip -r /home/aws-lambda-layer-osmtools-tilemaker.zip . && \
+    rm -rf /home/export
+
+RUN mkdir -p /home/export/bin && \
+    cd osmium-tool-1.18.0 && \
+    cp build/src/osmium /home/export/bin/osmium && \
+    mkdir -p /home/export/lib && \
+    cp /usr/lib64/liblz4.so.1 /home/export/lib/ && \
+    cd /home/export && \
+    zip -r /home/aws-lambda-layer-osmtools-osmium.zip . && \
+    rm -rf /home/export
