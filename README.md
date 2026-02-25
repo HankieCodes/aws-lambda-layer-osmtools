@@ -9,9 +9,18 @@ with precompiled C++ binaries ready to run on Amazon Linux 2023 (used by most La
 ## Usage
 
 1. Open the [Releases](https://github.com/hnryjms/aws-lambda-layer-osmtools/releases) page and find the latest release.
-2. Copy the corresponding `Layer ARN` for your AWS Region. 
+2. Copy the corresponding `Layer ARN` for your AWS Region.
+   1. All tools require the `-base` layer.
+   1. Then combine individual tools as additional layers.
 3. In `AWS Console > Lambda > (function) > Code > Layers`, paste this `Layer ARN`.
 4. Save your function :)
+
+| Layer | CLI Tools | Packages |
+| ----- | --------------- | -- |
+| `-base` | N/A  | N/A |
+| `-osrm` | <ul><li>`osrm-components`</li><li>`osrm-contract`</li><li>`osrm-customize`</li><li>`osrm-datastore`</li><li>`osrm-extract`</li><li>`osrm-partition`</li><li>`osrm-routed`</li></ul> | <ul><li>NodeJS: `@project-osrm/osrm`</li></ul> |
+| `-osmium` | <ul><li>`osmium`</li></ul> | None |
+| `-tilemaker` | <ul><li>`tilemaker`</li></ul> | None |
 
 You can confirm your app is ready with an example handler like:
 
