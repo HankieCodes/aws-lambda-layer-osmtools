@@ -41,10 +41,10 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Publish Layer
         run: |
-          aws s3 cp aws-lambda-layer-osmtools-base.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-base.zip
-          aws s3 cp aws-lambda-layer-osmtools-osmium.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-osmium.zip
-          aws s3 cp aws-lambda-layer-osmtools-osrm.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-osrm.zip
-          aws s3 cp aws-lambda-layer-osmtools-tilemaker.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-tilemaker.zip
+          aws s3 cp build/aws-lambda-layer-osmtools-base.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-base.zip
+          aws s3 cp build/aws-lambda-layer-osmtools-osmium.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-osmium.zip
+          aws s3 cp build/aws-lambda-layer-osmtools-osrm.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-osrm.zip
+          aws s3 cp build/aws-lambda-layer-osmtools-tilemaker.zip s3://aws-lambda-layer-osmtools/aws-lambda-layer-osmtools-tilemaker.zip
           
           export LAYER_VERSION_BASE=$(aws lambda publish-layer-version \
             --layer-name aws-lambda-layer-osmtools-base \
