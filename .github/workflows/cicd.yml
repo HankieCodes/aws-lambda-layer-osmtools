@@ -33,6 +33,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: aws-lambda-layer-osmtools
+          path: build
       - name: Authenticate AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
